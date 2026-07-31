@@ -1,0 +1,473 @@
+
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>REVIA — Decision Engine: Screens 7–9</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --primary:#1B4332;--primary-md:#2D6A4F;--secondary:#40916C;--accent:#D9A441;
+    --accent-lt:#F5E6C0;--bg:#F4F1EA;--surface:#FFFFFF;--surface2:#EEF0EB;
+    --border:#D8DDD5;--text:#1B1B1B;--muted:#6B7280;--success:#52B788;
+    --success-lt:#D8F0E5;--alert:#E07A5F;--alert-lt:#FAE5DF;
+    --r16:16px;--r20:20px;
+    --shadow-sm:0 2px 8px rgba(27,67,50,0.08);
+    --shadow-md:0 4px 20px rgba(27,67,50,0.13);
+    --shadow-lg:0 8px 36px rgba(27,67,50,0.18);
+    --font:-apple-system,"Segoe UI","Inter",system-ui,sans-serif;
+  }
+  body{background:#2D4A3A;font-family:var(--font);display:flex;flex-wrap:wrap;gap:32px;padding:48px 32px 72px;align-items:flex-start;justify-content:center;min-height:100vh}
+  .phone-wrap{display:flex;flex-direction:column;align-items:center}
+  .screen-label{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(244,241,234,0.45);margin-bottom:10px;text-align:center}
+  .phone{width:375px;height:812px;background:var(--bg);border-radius:46px;box-shadow:var(--shadow-lg),inset 0 0 0 1px rgba(255,255,255,0.45);overflow:hidden;display:flex;flex-direction:column;position:relative}
+  .phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:126px;height:30px;background:#111;border-radius:0 0 20px 20px;z-index:50}
+  .status{display:flex;justify-content:space-between;align-items:center;padding:16px 28px 6px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.88);flex-shrink:0;position:relative;z-index:5}
+  .body{flex:1;overflow-y:auto;scrollbar-width:none;display:flex;flex-direction:column}
+  .body::-webkit-scrollbar{display:none}
+  .nav{background:var(--surface);border-top:1px solid var(--border);display:flex;padding:10px 0 22px;flex-shrink:0}
+  .ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .ni-icon{font-size:19px;line-height:1}.ni-lbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em}
+  .ni.active .ni-lbl{color:var(--secondary)}.ni-dot{width:4px;height:4px;border-radius:50%;background:var(--secondary)}
+  .topbar{padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.12);flex-shrink:0}
+  .topbar-back{font-size:14px;color:rgba(255,255,255,0.65);font-weight:600}
+  .topbar-title{font-size:16px;font-weight:800;color:#fff}
+  .topbar-badge{font-size:10px;font-weight:700;color:var(--accent);background:rgba(217,164,65,0.22);padding:3px 10px;border-radius:20px;border:1px solid rgba(217,164,65,0.35)}
+  .chip{display:inline-block;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700}
+  .chip-green{background:var(--success-lt);color:var(--primary)}.chip-gold{background:var(--accent-lt);color:#7A5000}
+  .chip-muted{background:var(--surface2);color:var(--muted)}.chip-dark{background:var(--primary);color:#fff}
+  .gap{height:12px;flex-shrink:0}.gap-lg{height:20px;flex-shrink:0}
+
+  /* ANIMATIONS */
+  @keyframes dashDraw{0%{stroke-dashoffset:400}100%{stroke-dashoffset:0}}
+  @keyframes packetMove{0%{left:6%;opacity:0}5%{opacity:1}85%{opacity:1}95%{left:88%;opacity:0}100%{left:88%;opacity:0}}
+  @keyframes packetMoveB{0%{left:6%;opacity:0}10%{opacity:1}80%{opacity:1}95%{left:88%;opacity:0}100%{left:88%;opacity:0}}
+  @keyframes pulseRing{0%{transform:scale(1);opacity:0.65}100%{transform:scale(2.6);opacity:0}}
+  @keyframes dotBlink{0%,100%{opacity:1}50%{opacity:0.15}}
+  @keyframes cardFadeUp{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+  @keyframes countUp{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+  @keyframes barFill{0%{width:0%}100%{width:var(--w)}}
+  @keyframes arrowBounce{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+  @keyframes nodePop{0%{opacity:0;transform:scale(0.6)}70%{transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}
+  @keyframes glowPulse{0%,100%{box-shadow:0 0 0 0 rgba(64,145,108,0)}50%{box-shadow:0 0 0 8px rgba(64,145,108,0.18)}}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+
+  /* SCREEN 7 */
+  .match-hero{background:linear-gradient(155deg,var(--primary) 0%,var(--primary-md) 50%,#2D6A4F 100%);padding:14px 20px 18px;flex-shrink:0}
+  .mh-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:5px}
+  .mh-title{font-size:20px;font-weight:900;color:#fff;line-height:1.2}
+  .mh-title span{color:var(--accent)}
+  .mh-sub{font-size:12px;color:rgba(255,255,255,0.62);margin-top:3px;line-height:1.5}
+  .match-map{margin:14px 20px 0;background:#0D2418;border:2px solid rgba(64,145,108,0.35);border-radius:var(--r20);height:220px;position:relative;overflow:hidden;flex-shrink:0}
+  .match-map::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 24px,rgba(64,145,108,0.06) 25px),repeating-linear-gradient(90deg,transparent,transparent 24px,rgba(64,145,108,0.06) 25px);pointer-events:none;z-index:1}
+  .match-map-svg{position:absolute;inset:0;width:100%;height:100%;z-index:2;overflow:visible}
+  .map-node{position:absolute;z-index:4;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .mn-icon-wrap{width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;position:relative;animation:float 3s ease-in-out infinite}
+  .mn-source{background:rgba(64,145,108,0.35);border:2px solid var(--secondary)}
+  .mn-dest{background:rgba(217,164,65,0.3);border:2px solid var(--accent);animation-delay:0.6s}
+  .mn-label{font-size:9px;font-weight:800;color:#fff;text-align:center;background:rgba(0,0,0,0.5);padding:2px 8px;border-radius:20px;letter-spacing:0.04em;white-space:nowrap}
+  .mn-pulse{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;border:1.5px solid var(--secondary);animation:pulseRing 2s ease-out infinite;pointer-events:none}
+  .match-packet{position:absolute;top:46%;z-index:6;width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(217,164,65,0.7);animation:packetMove 2.4s ease-in-out infinite}
+  .match-packet-2{position:absolute;top:46%;z-index:6;width:7px;height:7px;border-radius:50%;background:rgba(217,164,65,0.55);box-shadow:0 0 6px rgba(217,164,65,0.4);animation:packetMoveB 2.4s ease-in-out 0.7s infinite}
+  .map-score-badge{position:absolute;top:12px;right:12px;z-index:6;background:var(--accent);color:#4A3000;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:900;box-shadow:0 2px 10px rgba(217,164,65,0.4)}
+  .map-dist-badge{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:6;background:rgba(0,0,0,0.55);color:rgba(255,255,255,0.9);padding:4px 12px;border-radius:20px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:5px}
+  .match-result{margin:12px 20px 0;background:var(--surface);border:1.5px solid var(--accent);border-radius:var(--r20);overflow:hidden;box-shadow:0 0 0 3px rgba(217,164,65,0.14),var(--shadow-md);flex-shrink:0;animation:cardFadeUp 0.4s ease-out 0.2s both}
+  .mr-top-strip{height:3px;background:linear-gradient(90deg,var(--accent),#F0C040)}
+  .mr-body{padding:12px 14px;display:flex;align-items:center;gap:12px}
+  .mr-icon-wrap{width:48px;height:48px;border-radius:16px;background:var(--accent-lt);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;animation:glowPulse 3s ease-in-out infinite}
+  .mr-info{flex:1}
+  .mr-mitra-name{font-size:15px;font-weight:900;color:var(--primary)}
+  .mr-mitra-type{font-size:11px;color:var(--muted);margin-top:1px}
+  .mr-chips{display:flex;gap:5px;margin-top:6px;flex-wrap:wrap}
+  .mr-score{text-align:center;flex-shrink:0}
+  .mrs-val{font-size:28px;font-weight:900;color:var(--accent);line-height:1;animation:countUp 0.5s ease-out 0.3s both}
+  .mrs-lbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-top:1px}
+  .match-stats{display:flex;margin:10px 20px 0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r16);overflow:hidden;box-shadow:var(--shadow-sm);flex-shrink:0}
+  .mstat-item{flex:1;padding:10px 8px;text-align:center;border-right:1px solid var(--border)}
+  .mstat-item:last-child{border-right:none}
+  .mstat-val{font-size:14px;font-weight:900;color:var(--text)}.mstat-val.green{color:var(--secondary)}.mstat-val.gold{color:#7A5000}
+  .mstat-label{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;margin-top:2px}
+  .step-status{margin:10px 20px 14px;display:flex;justify-content:space-between;align-items:flex-start;position:relative;flex-shrink:0}
+  .step-status::before{content:'';position:absolute;top:13px;left:20px;right:20px;height:2px;background:var(--border);z-index:0}
+  .ss-item{display:flex;flex-direction:column;align-items:center;gap:5px;z-index:1}
+  .ss-circle{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted)}
+  .ss-circle.done{background:var(--secondary);border-color:var(--secondary);color:#fff}
+  .ss-circle.active{background:var(--accent);border-color:var(--accent);color:#fff;animation:dotBlink 1.6s ease-in-out infinite}
+  .ss-lbl{font-size:9px;font-weight:700;color:var(--muted);text-align:center;max-width:55px;line-height:1.3}
+  .ss-lbl.done{color:var(--secondary)}.ss-lbl.active{color:var(--accent)}
+
+  /* SCREEN 8 */
+  .proc-hero{background:linear-gradient(155deg,var(--primary) 0%,#1E5C42 50%,var(--primary-md) 100%);padding:14px 20px 18px;flex-shrink:0}
+  .ph-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:5px}
+  .ph-title{font-size:20px;font-weight:900;color:#fff;line-height:1.2}
+  .ph-title span{color:var(--accent)}
+  .ph-sub{font-size:12px;color:rgba(255,255,255,0.62);margin-top:3px;line-height:1.5}
+  .flow-section{margin:0 20px;flex-shrink:0}
+  .flow-lane{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r16);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:10px;animation:cardFadeUp 0.4s ease-out both}
+  .flow-lane:nth-child(1){animation-delay:0.05s}.flow-lane:nth-child(2){animation-delay:0.18s}.flow-lane:nth-child(3){animation-delay:0.31s}
+  .fl-header{padding:9px 14px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+  .flh-color-bar{width:4px;height:20px;border-radius:2px;flex-shrink:0}
+  .flb-green{background:var(--secondary)}.flb-gold{background:var(--accent)}.flb-blue{background:#5B8DEF}
+  .flh-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);flex:1}
+  .flh-badge{font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px}
+  .fb-green{background:var(--success-lt);color:var(--primary)}.fb-gold{background:var(--accent-lt);color:#7A5000}.fb-blue{background:#E3EAF8;color:#1B3070}
+  .fl-nodes{display:flex;align-items:center;padding:12px 10px;gap:4px;overflow:hidden}
+  .fl-node{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;min-width:0;animation:nodePop 0.4s cubic-bezier(0.34,1.56,0.64,1) both}
+  .flow-lane:nth-child(1) .fl-node:nth-child(odd){animation-delay:0.10s}
+  .flow-lane:nth-child(1) .fl-node:nth-child(even){animation-delay:0.22s}
+  .flow-lane:nth-child(2) .fl-node:nth-child(odd){animation-delay:0.22s}
+  .flow-lane:nth-child(2) .fl-node:nth-child(even){animation-delay:0.34s}
+  .flow-lane:nth-child(3) .fl-node:nth-child(odd){animation-delay:0.34s}
+  .flow-lane:nth-child(3) .fl-node:nth-child(even){animation-delay:0.46s}
+  .fln-icon-wrap{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .fln-green{background:var(--success-lt)}.fln-amber{background:var(--accent-lt)}.fln-teal{background:#D8EEF0}
+  .fln-leaf{background:#E6F0DC}.fln-brown{background:#F0E8DC}.fln-paper{background:#EDE8F5}
+  .fln-blue{background:#E3EAF8}.fln-sky{background:#D8EAF8}.fln-grey{background:var(--surface2)}
+  .fln-name{font-size:9px;font-weight:700;color:var(--text);text-align:center;line-height:1.3}
+  .fl-arrow{font-size:13px;color:var(--secondary);flex-shrink:0;animation:arrowBounce 1.8s ease-in-out infinite}
+  .flow-lane:nth-child(2) .fl-arrow{color:#9A7000}
+  .flow-lane:nth-child(3) .fl-arrow{color:#3B6FC4}
+  .fl-output-row{padding:0 14px 11px;display:flex;align-items:center;gap:8px}
+  .fl-out-icon{font-size:14px}
+  .fl-out-text{font-size:11px;font-weight:700;flex:1}
+  .fl-out-text.green{color:var(--primary)}.fl-out-text.gold{color:#7A5000}.fl-out-text.blue{color:#1B3070}
+  .fl-out-val{font-size:11px;font-weight:800}
+  .fl-out-val.green{color:var(--secondary)}.fl-out-val.gold{color:var(--accent)}.fl-out-val.blue{color:#5B8DEF}
+  .proc-summary{margin:0 20px;background:var(--primary);border-radius:var(--r16);padding:12px 16px;display:flex;align-items:center;flex-shrink:0;box-shadow:var(--shadow-md);overflow:hidden;position:relative}
+  .proc-summary::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 85% 50%,rgba(217,164,65,0.1) 0%,transparent 60%);pointer-events:none}
+  .psum-item{flex:1;text-align:center;border-right:1px solid rgba(255,255,255,0.1);padding:0 8px}
+  .psum-item:last-child{border-right:none}
+  .psum-val{font-size:15px;font-weight:900;color:#fff;line-height:1;animation:countUp 0.5s ease-out both}
+  .psum-val.gold{color:var(--accent)}.psum-val.green{color:#74C69D}
+  .psum-item:nth-child(1) .psum-val{animation-delay:0.1s}.psum-item:nth-child(2) .psum-val{animation-delay:0.3s}.psum-item:nth-child(3) .psum-val{animation-delay:0.5s}
+  .psum-label{font-size:8.5px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.03em;margin-top:3px}
+
+  /* SCREEN 9 */
+  .port-hero{background:linear-gradient(140deg,var(--primary) 0%,#1E5C42 50%,var(--primary-md) 100%);padding:14px 20px 18px;flex-shrink:0}
+  .porto-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:5px}
+  .porto-title{font-size:20px;font-weight:900;color:#fff;line-height:1.2}
+  .porto-title span{color:var(--accent)}
+  .porto-sub{font-size:12px;color:rgba(255,255,255,0.62);margin-top:3px;line-height:1.5}
+  .routing-section{margin:0 20px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r20);overflow:hidden;box-shadow:var(--shadow-sm);flex-shrink:0}
+  .routing-header{background:var(--surface2);border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;justify-content:space-between}
+  .rh-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted)}
+  .rh-live{font-size:9px;font-weight:700;color:var(--secondary);background:var(--success-lt);padding:2px 8px;border-radius:20px;display:flex;align-items:center;gap:4px}
+  .rh-dot{width:6px;height:6px;border-radius:50%;background:var(--success);animation:dotBlink 0.9s ease-in-out infinite}
+  .routing-nodes{display:flex;align-items:flex-start;padding:14px 10px;gap:2px;overflow:hidden}
+  .route-node{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;min-width:0;animation:nodePop 0.4s cubic-bezier(0.34,1.56,0.64,1) both}
+  .route-node:nth-child(1){animation-delay:0.05s}.route-node:nth-child(3){animation-delay:0.15s}
+  .route-node:nth-child(5){animation-delay:0.25s}.route-node:nth-child(7){animation-delay:0.35s}
+  .route-node:nth-child(9){animation-delay:0.45s}
+  .rn-icon-wrap{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;position:relative}
+  .rni-sekolah{background:#EDE8F5;border:2px solid #9B72CF}
+  .rni-petani{background:#E6F0DC;border:2px solid var(--secondary)}
+  .rni-komunitas{background:var(--success-lt);border:2px solid var(--success)}
+  .rni-umkm{background:#E3EAF8;border:2px solid #5B8DEF}
+  .rni-market{background:var(--accent-lt);border:2px solid var(--accent)}
+  .rn-name{font-size:9px;font-weight:700;color:var(--text);text-align:center;line-height:1.3}
+  .route-arrow{font-size:14px;color:var(--secondary);flex-shrink:0;animation:arrowBounce 1.8s ease-in-out infinite;padding-top:12px}
+  .route-arrow:nth-child(2){animation-delay:0.2s}.route-arrow:nth-child(4){animation-delay:0.4s}
+  .route-arrow:nth-child(6){animation-delay:0.6s}.route-arrow:nth-child(8){animation-delay:0.8s}
+  .rn-icon-wrap.active::after{content:'';position:absolute;inset:-3px;border-radius:17px;border:2px solid var(--accent);animation:dotBlink 1.4s ease-in-out infinite}
+  .route-packets{border-top:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .rp-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em}
+  .rp-chip{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;display:flex;align-items:center;gap:4px}
+  .rpc-green{background:var(--success-lt);color:var(--primary)}.rpc-gold{background:var(--accent-lt);color:#7A5000}.rpc-blue{background:#E3EAF8;color:#1B3070}
+  .port-section-hdr{padding:12px 20px 8px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+  .psh-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted)}
+  .psh-period{font-size:10px;font-weight:700;color:var(--secondary)}
+  .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px;flex-shrink:0}
+  .metric-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r16);padding:13px 12px 11px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;animation:cardFadeUp 0.4s ease-out both}
+  .metric-card:nth-child(1){animation-delay:0.05s}.metric-card:nth-child(2){animation-delay:0.12s}
+  .metric-card:nth-child(3){animation-delay:0.19s}.metric-card:nth-child(4){animation-delay:0.26s}
+  .metric-card:nth-child(5){animation-delay:0.33s}.metric-card:nth-child(6){animation-delay:0.40s}
+  .metric-card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;border-radius:2px 0 0 2px}
+  .mc-green::before{background:var(--secondary)}.mc-forest::before{background:var(--primary)}
+  .mc-gold::before{background:var(--accent)}.mc-teal::before{background:#3CB3BB}
+  .mc-purple::before{background:#9B72CF}.mc-sdg::before{background:#E07A5F}
+  .mc-icon{font-size:18px;margin-bottom:5px;line-height:1}
+  .mc-val{font-size:20px;font-weight:900;line-height:1;animation:countUp 0.55s ease-out both}
+  .metric-card:nth-child(1) .mc-val{animation-delay:0.15s;color:var(--secondary)}
+  .metric-card:nth-child(2) .mc-val{animation-delay:0.25s;color:var(--primary)}
+  .metric-card:nth-child(3) .mc-val{animation-delay:0.35s;color:#7A5000}
+  .metric-card:nth-child(4) .mc-val{animation-delay:0.45s;color:#3CB3BB}
+  .metric-card:nth-child(5) .mc-val{animation-delay:0.55s;color:#9B72CF}
+  .metric-card:nth-child(6) .mc-val{animation-delay:0.65s;color:var(--alert)}
+  .mc-unit{font-size:10px;font-weight:700;color:var(--muted);margin-top:2px}
+  .mc-label{font-size:9.5px;font-weight:700;color:var(--muted);margin-top:4px;line-height:1.35;text-transform:uppercase;letter-spacing:0.04em}
+  .mc-delta{font-size:10px;font-weight:700;color:var(--success);margin-top:4px}
+  .mc-bar-wrap{margin-top:6px}.mc-bar-track{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden}
+  .mc-bar-fill{height:100%;border-radius:2px;animation:barFill 1.4s cubic-bezier(0.22,1,0.36,1) both}
+  .metric-card:nth-child(1) .mc-bar-fill{animation-delay:0.20s;background:var(--secondary)}
+  .metric-card:nth-child(2) .mc-bar-fill{animation-delay:0.30s;background:var(--primary)}
+  .metric-card:nth-child(3) .mc-bar-fill{animation-delay:0.40s;background:var(--accent)}
+  .metric-card:nth-child(4) .mc-bar-fill{animation-delay:0.50s;background:#3CB3BB}
+  .metric-card:nth-child(5) .mc-bar-fill{animation-delay:0.60s;background:#9B72CF}
+  .metric-card:nth-child(6) .mc-bar-fill{animation-delay:0.70s;background:var(--alert)}
+  .sdg-row{display:flex;gap:8px;padding:10px 20px 0;flex-shrink:0}
+  .sdg-badge{flex:1;border-radius:var(--r16);padding:10px 8px;text-align:center}
+  .sdg-num{font-size:20px;font-weight:900;color:#fff;line-height:1;animation:countUp 0.5s ease-out both}
+  .sdg-badge:nth-child(1) .sdg-num{animation-delay:0.3s}.sdg-badge:nth-child(2) .sdg-num{animation-delay:0.5s}.sdg-badge:nth-child(3) .sdg-num{animation-delay:0.7s}
+  .sdg-title{font-size:8.5px;font-weight:700;color:rgba(255,255,255,0.82);margin-top:2px;text-transform:uppercase;letter-spacing:0.04em;line-height:1.3}
+  .sdg-11{background:#F99D26}.sdg-12{background:#BF8B2E}.sdg-13{background:#3F7E44}
+
+  footer{width:100%;text-align:center;padding:28px 0 12px;font-size:11px;color:rgba(244,241,234,0.35);font-family:var(--font);border-top:1px solid rgba(244,241,234,0.12);margin-top:24px}
+</style>
+</head>
+<body>
+
+
+<div class="phone-wrap">
+  <div class="screen-label">DE–07 — First Resource Matching · Animated Route</div>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span style="font-size:10px;color:rgba(255,255,255,0.75)">▲▲▲ WiFi 100%</span></div>
+    <div class="match-hero">
+      <div class="topbar" style="padding:0 0 12px">
+        <div class="topbar-back">← Recovery Path</div>
+        <div class="topbar-title">Resource <span style="color:var(--accent)">Match</span></div>
+        <div class="topbar-badge">Tahap 5 / 7</div>
+      </div>
+      <div class="mh-eyebrow">Decision Engine · Pencocokan Pertama</div>
+      <div class="mh-title">Resource <span>Dikirim</span><br />ke Mitra Terpilih</div>
+      <div class="mh-sub">Jalur optimal ditemukan. Resource sedang dalam proses penjemputan menuju Maggot Farm BSF.</div>
+    </div>
+    <div class="body">
+      <div class="match-map">
+        <svg class="match-map-svg">
+          <path d="M 46 140 Q 168 80 290 100" fill="none" stroke="rgba(64,145,108,0.12)" stroke-width="14" stroke-linecap="round"></path>
+          <path d="M 46 140 Q 168 80 290 100" fill="none" stroke="var(--secondary)" stroke-width="2.5" stroke-linecap="round" style="animation:dashDraw 1.8s ease-out 0.2s forwards"></path>
+          <path d="M 46 140 Q 168 80 290 100" fill="none" stroke="rgba(217,164,65,0.45)" stroke-width="1.5" stroke-linecap="round" style="animation:dashDraw 2.2s ease-out 0.5s forwards"></path>
+          <rect x="138" y="68" width="60" height="18" rx="9" fill="rgba(0,0,0,0.5)"></rect>
+          <text x="168" y="81" font-size="9" fill="rgba(255,255,255,0.85)" text-anchor="middle" font-family="system-ui" font-weight="700">2.3 km · 12 min</text>
+          <text x="16" y="200" font-size="8" fill="rgba(82,183,136,0.35)" font-family="monospace">-7.79°S</text>
+          <text x="270" y="200" font-size="8" fill="rgba(82,183,136,0.35)" font-family="monospace">110.37°E</text>
+        </svg>
+        <div class="map-node" style="left:14px;top:104px">
+          <div class="mn-icon-wrap mn-source">🥬<div class="mn-pulse"></div></div>
+          <div class="mn-label">Toko Maju Jaya</div>
+        </div>
+        <div class="map-node" style="right:14px;top:62px">
+          <div class="mn-icon-wrap mn-dest">🪱<div class="mn-pulse"></div></div>
+          <div class="mn-label">Maggot Farm BSF</div>
+        </div>
+        <div class="match-packet"></div>
+        <div class="match-packet-2"></div>
+        <div class="map-score-badge">⚡ Score 95</div>
+        <div class="map-dist-badge"><span>📍</span>2.3 km · ETA ~12 menit</div>
+      </div>
+      <div class="match-result">
+        <div class="mr-top-strip"></div>
+        <div class="mr-body">
+          <div class="mr-icon-wrap">🪱</div>
+          <div class="mr-info">
+            <div class="mr-mitra-name">CV Berkah Maggot BSF</div>
+            <div class="mr-mitra-type">Maggot Farm · Terverifikasi REVIA · Sleman, DIY</div>
+            <div class="mr-chips">
+              <span class="chip chip-gold">★ Pilihan Terbaik</span>
+              <span class="chip chip-green">Loop Tertutup</span>
+            </div>
+          </div>
+          <div class="mr-score"><div class="mrs-val">95</div><div class="mrs-lbl">Score</div></div>
+        </div>
+      </div>
+      <div class="match-stats">
+        <div class="mstat-item"><div class="mstat-val green">8.5 kg</div><div class="mstat-label">Resource</div></div>
+        <div class="mstat-item"><div class="mstat-val gold">Rp202.500</div><div class="mstat-label">Est. Nilai</div></div>
+        <div class="mstat-item"><div class="mstat-val green">-18 kg</div><div class="mstat-label">CO₂ Hemat</div></div>
+      </div>
+      <div class="step-status">
+        <div class="ss-item"><div class="ss-circle done">✓</div><div class="ss-lbl done">Match<br />Ditemukan</div></div>
+        <div class="ss-item"><div class="ss-circle active">🚚</div><div class="ss-lbl active">Penjemputan<br />Aktif</div></div>
+        <div class="ss-item"><div class="ss-circle">⚙️</div><div class="ss-lbl">Proses<br />Resource</div></div>
+        <div class="ss-item"><div class="ss-circle">🌱</div><div class="ss-lbl">Nilai<br />Tercatat</div></div>
+      </div>
+    </div>
+    <div class="nav">
+      <div class="ni"><div class="ni-icon">🏠</div><div class="ni-lbl">Beranda</div></div>
+      <div class="ni"><div class="ni-icon">🔍</div><div class="ni-lbl">Temukan</div></div>
+      <div class="ni active"><div class="ni-icon">⚡</div><div class="ni-lbl">Engine</div><div class="ni-dot"></div></div>
+      <div class="ni"><div class="ni-icon">💬</div><div class="ni-lbl">Pesan</div></div>
+      <div class="ni"><div class="ni-icon">👤</div><div class="ni-lbl">Profil</div></div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="phone-wrap">
+  <div class="screen-label">DE–08 — Resource Processing · 3 Parallel Flows</div>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span style="font-size:10px;color:rgba(255,255,255,0.75)">▲▲▲ WiFi 100%</span></div>
+    <div class="proc-hero">
+      <div class="topbar" style="padding:0 0 12px">
+        <div class="topbar-back">← Matching</div>
+        <div class="topbar-title">Transformasi <span style="color:var(--accent)">Resource</span></div>
+        <div class="topbar-badge">Tahap 6 / 7</div>
+      </div>
+      <div class="ph-eyebrow">Decision Engine · Pemrosesan Paralel</div>
+      <div class="ph-title">3 Jalur <span>Transformasi</span><br />Berjalan Bersamaan</div>
+      <div class="ph-sub">Setiap jenis resource diproses melalui jalur spesialisasi mitra yang optimal.</div>
+    </div>
+    <div class="body">
+      <div class="gap"></div>
+      <div class="flow-section">
+        
+        <div class="flow-lane">
+          <div class="fl-header"><div class="flh-color-bar flb-green"></div><div class="flh-title">Jalur Organik</div><div class="flh-badge fb-green">● Aktif</div></div>
+          <div class="fl-nodes">
+            <div class="fl-node"><div class="fln-icon-wrap fln-green">🥬</div><div class="fln-name">Sisa Sayur</div></div>
+            <div class="fl-arrow">→</div>
+            <div class="fl-node"><div class="fln-icon-wrap fln-amber">🪱</div><div class="fln-name">Maggot BSF</div></div>
+            <div class="fl-arrow">→</div>
+            <div class="fl-node"><div class="fln-icon-wrap fln-teal">🫙</div><div class="fln-name">Kasgot</div></div>
+            <div class="fl-arrow">→</div>
+            <div class="fl-node"><div class="fln-icon-wrap fln-leaf">🌿</div><div class="fln-name">Pupuk Organik</div></div>
+          </div>
+          <div class="fl-output-row"><span class="fl-out-icon">💰</span><span class="fl-out-text green">Nilai Output</span><span class="fl-out-val green">Rp202.500</span></div>
+        </div>
+        
+        <div class="flow-lane">
+          <div class="fl-header"><div class="flh-color-bar flb-gold"></div><div class="flh-title">Jalur Daur Ulang</div><div class="flh-badge fb-gold">● Aktif</div></div>
+          <div class="fl-nodes">
+            <div class="fl-node"><div class="fln-icon-wrap fln-brown">📦</div><div class="fln-name">Kardus</div></div>
+            <div class="fl-arrow">→</div>
+            <div class="fl-node"><div class="fln-icon-wrap fln-amber">🏪</div><div class="fln-name">UMKM</div></div>
+            <div class="fl-arrow">→</div>
+            <div class="fl-node"><div class="fln-icon-wrap fln-paper">✂️</div><div class="fln-name">Produk Kerajinan</div></div>
+          </div>
+          <div class="fl-output-row"><span class="fl-out-icon">💰</span><span class="fl-out-text gold">Nilai Output</span><span class="fl-out-val gold">Rp45.000</span></div>
+        </div>
+        
+        <div class="flow-lane" style="margin-bottom:0">
+          <div class="fl-header"><div class="flh-color-bar flb-blue"></div><div class="flh-title">Jalur Industri</div><div class="flh-badge fb-blue">● Aktif</div></div>
+          <div class="fl-nodes">
+            <div class="fl-node"><div class="fln-icon-wrap fln-blue">🧴</div><div class="fln-name">Plastik</div></div>
+            <div class="fl-arrow">→</div>
+            <div class="fl-node"><div class="fln-icon-wrap fln-sky">🏭</div><div class="fln-name">Industri</div></div>
+            <div class="fl-arrow">→</div>
+            <div class="fl-node"><div class="fln-icon-wrap fln-grey">♻️</div><div class="fln-name">Produk Daur Ulang</div></div>
+          </div>
+          <div class="fl-output-row"><span class="fl-out-icon">💰</span><span class="fl-out-text blue">Nilai Output</span><span class="fl-out-val blue">Rp28.000</span></div>
+        </div>
+      </div>
+      <div class="gap"></div>
+      <div class="proc-summary">
+        <div class="psum-item"><div class="psum-val gold">Rp276rb</div><div class="psum-label">Total Nilai</div></div>
+        <div class="psum-item"><div class="psum-val green">-42 kg</div><div class="psum-label">CO₂ Hemat</div></div>
+        <div class="psum-item"><div class="psum-val">3 Jalur</div><div class="psum-label">Aktif</div></div>
+      </div>
+      <div class="gap-lg"></div>
+    </div>
+    <div class="nav">
+      <div class="ni"><div class="ni-icon">🏠</div><div class="ni-lbl">Beranda</div></div>
+      <div class="ni"><div class="ni-icon">🔍</div><div class="ni-lbl">Temukan</div></div>
+      <div class="ni active"><div class="ni-icon">⚡</div><div class="ni-lbl">Engine</div><div class="ni-dot"></div></div>
+      <div class="ni"><div class="ni-icon">💬</div><div class="ni-lbl">Pesan</div></div>
+      <div class="ni"><div class="ni-icon">👤</div><div class="ni-lbl">Profil</div></div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="phone-wrap">
+  <div class="screen-label">DE–09 — 2nd Matching + Environmental Portfolio</div>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span style="font-size:10px;color:rgba(255,255,255,0.75)">▲▲▲ WiFi 100%</span></div>
+    <div class="port-hero">
+      <div class="topbar" style="padding:0 0 12px">
+        <div class="topbar-back">← Processing</div>
+        <div class="topbar-title">Dampak <span style="color:var(--accent)">Lingkungan</span></div>
+        <div class="topbar-badge">Tahap 7 / 7</div>
+      </div>
+      <div class="porto-eyebrow">Decision Engine · Output &amp; Portfolio</div>
+      <div class="porto-title">Routing Lanjutan<br />&amp; <span>Impact Dashboard</span></div>
+      <div class="porto-sub">Produk hasil transformasi didistribusikan ke penerima akhir. Dampak nyata tercatat.</div>
+    </div>
+    <div class="body">
+      <div class="gap"></div>
+      <div class="routing-section">
+        <div class="routing-header">
+          <div class="rh-label">Prioritas Routing Output</div>
+          <div class="rh-live"><div class="rh-dot"></div>Live</div>
+        </div>
+        <div class="routing-nodes">
+          <div class="route-node"><div class="rn-icon-wrap rni-sekolah">🏫</div><div class="rn-name">Sekolah</div></div>
+          <div class="route-arrow">→</div>
+          <div class="route-node"><div class="rn-icon-wrap rni-petani active">🌾</div><div class="rn-name">Petani</div></div>
+          <div class="route-arrow">→</div>
+          <div class="route-node"><div class="rn-icon-wrap rni-komunitas">👥</div><div class="rn-name">Komunitas</div></div>
+          <div class="route-arrow">→</div>
+          <div class="route-node"><div class="rn-icon-wrap rni-umkm">🏪</div><div class="rn-name">UMKM</div></div>
+          <div class="route-arrow">→</div>
+          <div class="route-node"><div class="rn-icon-wrap rni-market">🛒</div><div class="rn-name">Market</div></div>
+        </div>
+        <div class="route-packets">
+          <div class="rp-label">Output:</div>
+          <div class="rp-chip rpc-green">🌿 Pupuk Organik</div>
+          <div class="rp-chip rpc-gold">✂️ Kerajinan</div>
+          <div class="rp-chip rpc-blue">♻️ Daur Ulang</div>
+        </div>
+      </div>
+      <div class="port-section-hdr">
+        <div class="psh-title">Environmental Impact Portfolio</div>
+        <div class="psh-period">Jan–Mar 2025</div>
+      </div>
+      <div class="metric-grid">
+        <div class="metric-card mc-green">
+          <div class="mc-icon">🗑️</div><div class="mc-val">8.4 t</div>
+          <div class="mc-label">Resource Diverted from Landfill</div>
+          <div class="mc-delta">↑ +1.2 t bulan ini</div>
+          <div class="mc-bar-wrap"><div class="mc-bar-track"><div class="mc-bar-fill" style="--w:84%"></div></div></div>
+        </div>
+        <div class="metric-card mc-forest">
+          <div class="mc-icon">🌿</div><div class="mc-val">3.2 t</div>
+          <div class="mc-label">CO₂ Reduction</div>
+          <div class="mc-delta">↑ +340 kg bulan ini</div>
+          <div class="mc-bar-wrap"><div class="mc-bar-track"><div class="mc-bar-fill" style="--w:72%"></div></div></div>
+        </div>
+        <div class="metric-card mc-gold">
+          <div class="mc-icon">💰</div><div class="mc-val">Rp18jt</div>
+          <div class="mc-label">Economic Value Generated</div>
+          <div class="mc-delta">↑ +22% vs bln lalu</div>
+          <div class="mc-bar-wrap"><div class="mc-bar-track"><div class="mc-bar-fill" style="--w:78%"></div></div></div>
+        </div>
+        <div class="metric-card mc-teal">
+          <div class="mc-icon">♾️</div><div class="mc-val">79</div>
+          <div class="mc-unit">/ 100 Index</div>
+          <div class="mc-label">Circularity Index</div>
+          <div class="mc-bar-wrap"><div class="mc-bar-track"><div class="mc-bar-fill" style="--w:79%"></div></div></div>
+        </div>
+        <div class="metric-card mc-purple">
+          <div class="mc-icon">👥</div><div class="mc-val">247</div>
+          <div class="mc-unit">Penerima Manfaat</div>
+          <div class="mc-label">Social Beneficiaries</div>
+          <div class="mc-bar-wrap"><div class="mc-bar-track"><div class="mc-bar-fill" style="--w:65%"></div></div></div>
+        </div>
+        <div class="metric-card mc-sdg">
+          <div class="mc-icon">🌍</div><div class="mc-val">3 SDGs</div>
+          <div class="mc-label">SDGs Contribution</div>
+          <div class="mc-delta">SDG 11 · 12 · 13</div>
+          <div class="mc-bar-wrap"><div class="mc-bar-track"><div class="mc-bar-fill" style="--w:90%"></div></div></div>
+        </div>
+      </div>
+      <div class="sdg-row">
+        <div class="sdg-badge sdg-11"><div class="sdg-num">11</div><div class="sdg-title">Kota &amp; Komunitas Berkelanjutan</div></div>
+        <div class="sdg-badge sdg-12"><div class="sdg-num">12</div><div class="sdg-title">Konsumsi &amp; Produksi Bertanggung Jawab</div></div>
+        <div class="sdg-badge sdg-13"><div class="sdg-num">13</div><div class="sdg-title">Penanganan Perubahan Iklim</div></div>
+      </div>
+      <div class="gap-lg"></div>
+    </div>
+    <div class="nav">
+      <div class="ni"><div class="ni-icon">🏠</div><div class="ni-lbl">Beranda</div></div>
+      <div class="ni"><div class="ni-icon">🔍</div><div class="ni-lbl">Temukan</div></div>
+      <div class="ni active"><div class="ni-icon">⚡</div><div class="ni-lbl">Dampak</div><div class="ni-dot"></div></div>
+      <div class="ni"><div class="ni-icon">💬</div><div class="ni-lbl">Pesan</div></div>
+      <div class="ni"><div class="ni-icon">👤</div><div class="ni-lbl">Profil</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>REVIA — Decision Engine: How It Works · Screens 7–9 · Made with IBM Bob</footer>
+</body>
+</html>
